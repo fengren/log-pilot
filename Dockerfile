@@ -1,4 +1,4 @@
-FROM golang:1.9-alpine3.6 as builder
+FROM hub.fast360.xyz/golang:1.23-alpine as builder
 
 ENV PILOT_DIR /go/src/github.com/AliyunContainerService/log-pilot
 ARG GOOS=linux
@@ -8,16 +8,16 @@ WORKDIR $PILOT_DIR
 COPY . $PILOT_DIR
 RUN go install 
 
-FROM alpine:3.6
+FROM registry-dev.youle.game/common/alpine:3.16-tz
 
-ENV FILEBEAT_VERSION=6.1.1-3
+ENV FILEBEAT_VERSION=7.15.1
 COPY assets/glibc/glibc-2.26-r0.apk /tmp/
 RUN apk update && \ 
     apk add python && \
     apk add ca-certificates && \
     apk add wget && \
     update-ca-certificates && \
-    wget http://acs-logging.oss-cn-hangzhou.aliyuncs.com/beats/filebeat/filebeat-${FILEBEAT_VERSION}-linux-x86_64.tar.gz -P /tmp/ && \
+    wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.15.1-linux-x86_64.tar.gz -P /tmp/ && \
     mkdir -p /etc/filebeat /var/lib/filebeat /var/log/filebeat && \
     tar zxf /tmp/filebeat-${FILEBEAT_VERSION}-linux-x86_64.tar.gz -C /tmp/ && \
     cp -rf /tmp/filebeat-${FILEBEAT_VERSION}-linux-x86_64/filebeat /usr/bin/ && \
